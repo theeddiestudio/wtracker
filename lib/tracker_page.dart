@@ -240,6 +240,8 @@ class _TrackerPageState extends State<TrackerPage> {
                 ),
             ],
           ),
+          const SizedBox(height: 8),
+          const Divider(thickness: 3),
           const SizedBox(height: 20),
 
           // Weight inputs and ignore cross buttons
@@ -250,13 +252,16 @@ class _TrackerPageState extends State<TrackerPage> {
           _buildWeightInput(
               'Before Sleep', _bwslpController, _ignoreBwslp, 'bwslp'),
 
-          const SizedBox(height: 20),
-
+          const SizedBox(height: 10),
+          const Divider(thickness: 2),
+          const SizedBox(height: 10),
           // Today's weight
           Text(
             'Today\'s Weight: ${_calculateBwDay()?.toStringAsFixed(2) ?? "X"}',
-            style: const TextStyle(fontSize: 16),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
+
+          const SizedBox(height: 3),
 
           // Week's average
           FutureBuilder<double?>(

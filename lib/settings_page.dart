@@ -140,8 +140,10 @@ class _SettingsPageState extends State<SettingsPage> {
         title: const Text('Settings'),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(10),
         children: [
+          const Divider(thickness: 3),
+          const SizedBox(height: 8),
           SwitchListTile(
             title: const Text('Enable Dots'),
             value: _showDots,
@@ -177,6 +179,9 @@ class _SettingsPageState extends State<SettingsPage> {
               await _handleNotificationToggle(value);
             },
           ),
+          const SizedBox(height: 5),
+          const Divider(thickness: 2),
+          const SizedBox(height: 5),
           ListTile(
             title: const Text('Launch App Settings'),
             trailing: const Icon(Icons.settings),

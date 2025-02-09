@@ -98,9 +98,13 @@ class _GraphPageState extends State<GraphPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            const SizedBox(height: 20),
+            const SizedBox(height: 5),
+            const Divider(thickness: 3),
+            const SizedBox(height: 10),
             _buildGraphCard('Weekly Weight Graph', _buildWeeklyChart()),
-            const SizedBox(height: 40),
+            const SizedBox(height: 20),
+            const Divider(thickness: 2),
+            const SizedBox(height: 20),
             _buildGraphCard('Monthly Weight Graph', _buildMonthlyChart()),
             const SizedBox(height: 20), // Add bottom padding
           ],
