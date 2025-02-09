@@ -3,7 +3,7 @@ description: A weight tracking app.
 
 publish_to: 'none' # Remove this line if you want to publish to pub.dev
 
-version: 1.1.1+1
+version: 1.1.2+1
 
 environment:
   sdk: '>=3.0.0 <4.0.0'

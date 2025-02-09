@@ -126,41 +126,45 @@ class DatabaseHelper {
   Future<double> updateWeekAverages(String date) async {
     final db = await database;
     DateTime targetDate = DateTime.parse(date);
-    DateTime sunday =
-        targetDate.subtract(Duration(days: targetDate.weekday % 7));
 
-    // Fetch all entries for the week (from Sunday to targetDate)
+    // Find the full week range (Sunday to Saturday)
+    DateTime sunday = targetDate.subtract(
+        Duration(days: targetDate.weekday == 7 ? 0 : targetDate.weekday));
+    DateTime saturday = sunday.add(Duration(days: 6));
+
+    // Fetch all weight entries within the full week range
     List<Map<String, dynamic>> result = await db.query(
       'weight_entries',
       where: 'date BETWEEN ? AND ?',
-      whereArgs: [sunday.toIso8601String().substring(0, 10), date],
+      whereArgs: [
+        sunday.toIso8601String().substring(0, 10),
+        saturday.toIso8601String().substring(0, 10)
+      ],
       orderBy: 'date ASC',
     );
 
-    // Calculate the average bwday for the week, ignoring days with bwday = 0
-    List<double> validWeights = [];
-    for (var row in result) {
-      double weight = row['bwday'] ?? 0.0;
-      if (weight > 0) {
-        validWeights.add(weight);
-      }
-    }
+    // Calculate bwwk using all days in the week, ignoring bwday = 0
+    List<double> validWeights = result
+        .map((row) => row['bwday'] as double? ?? 0.0)
+        .where((bw) => bw > 0)
+        .toList();
 
     double bwwk = validWeights.isNotEmpty
         ? validWeights.reduce((a, b) => a + b) / validWeights.length
         : 0.0;
 
-    // Update bwwk for all days in the week
-    for (var row in result) {
+    // Ensure bwwk is updated for all days in the week (even missing ones)
+    for (int i = 0; i < 7; i++) {
+      String currentDate =
+          sunday.add(Duration(days: i)).toIso8601String().substring(0, 10);
       await db.update(
         'weight_entries',
         {'bwwk': bwwk},
         where: 'date = ?',
-        whereArgs: [row['date']],
+        whereArgs: [currentDate],
       );
     }
 
-    // Return the calculated bwwk value
     return bwwk;
   }
 

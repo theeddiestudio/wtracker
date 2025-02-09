@@ -170,7 +170,7 @@ class _GraphPageState extends State<GraphPage> {
           spots: spots,
           isCurved: false,
           color: lineColor,
-          dotData: FlDotData(show: _showDots), //_showDots),
+          dotData: FlDotData(show: _showDots),
           belowBarData: BarAreaData(show: false),
         ),
       ],
