@@ -102,71 +102,98 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 }
 
-class DetailPage extends StatelessWidget {
+class DetailPage extends StatefulWidget {
   final WeightEntry entry;
   const DetailPage({super.key, required this.entry});
 
   @override
-  Widget build(BuildContext context) {
-    // Function to get value or show "X" if ignored
-    String _getValueOrX(double? value, bool isIgnored) {
-      if (isIgnored) {
-        return 'X'; // Return "X" for ignored values
-      }
-      return value?.toStringAsFixed(2) ??
-          'N/A'; // Return formatted value or "N/A" if null
-    }
+  _DetailPageState createState() => _DetailPageState();
+}
 
+class _DetailPageState extends State<DetailPage> {
+  double? bwwk;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchBwwk();
+  }
+
+  Future<void> _fetchBwwk() async {
+    final dbHelper = DatabaseHelper.instance;
+    final db = await dbHelper.database;
+
+    List<Map<String, dynamic>> result = await db.query(
+      'weight_entries',
+      columns: ['bwwk'],
+      where: 'id = ?',
+      whereArgs: [widget.entry.id],
+    );
+
+    if (result.isNotEmpty) {
+      setState(() {
+        bwwk = result.first['bwwk'];
+      });
+    }
+  }
+
+  String _getValueOrX(double? value, bool isIgnored) {
+    if (isIgnored) {
+      return 'X';
+    }
+    return value?.toStringAsFixed(2) ?? 'N/A';
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Entry Details"),
-        actions: [
-          /* IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pop(context); // Go back to the history page
-            },
-          ), */
-        ],
-      ),
+      appBar: AppBar(title: const Text("Entry Details")),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Date: ${entry.date}', style: const TextStyle(fontSize: 18)),
+            Text('Date: ${widget.entry.date}',
+                style: const TextStyle(fontSize: 18)),
+            const Divider(thickness: 2), // Horizontal line
             const SizedBox(height: 8),
             Text(
-              'Bodyweight: ${_getValueOrX(entry.bwday, entry.bwday == null)} kg',
+              'Morning Weight: ${_getValueOrX(widget.entry.bwmrg, widget.entry.bwmrg == null)} kg',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),
             Text(
-              'Morning Weight: ${_getValueOrX(entry.bwmrg, entry.bwmrg == null)} kg',
+              'Before Gym: ${_getValueOrX(widget.entry.bwbg, widget.entry.bwbg == null)} kg',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),
             Text(
-              'Before Gym: ${_getValueOrX(entry.bwbg, entry.bwbg == null)} kg',
+              'After Gym: ${_getValueOrX(widget.entry.bwag, widget.entry.bwag == null)} kg',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),
             Text(
-              'After Gym: ${_getValueOrX(entry.bwag, entry.bwag == null)} kg',
+              'Before Sleep: ${_getValueOrX(widget.entry.bwslp, widget.entry.bwslp == null)} kg',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),
+            const Divider(thickness: 2), // Horizontal line
+            const SizedBox(height: 8),
             Text(
-              'Before Sleep: ${_getValueOrX(entry.bwslp, entry.bwslp == null)} kg',
-              style: const TextStyle(fontSize: 16),
+              'Bodyweight: ${_getValueOrX(widget.entry.bwday, widget.entry.bwday == null)} kg',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Week Average: ${bwwk != null ? bwwk!.toStringAsFixed(2) : "N/A"} kg',
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
             FloatingActionButton.extended(
               onPressed: () async {
                 final dbHelper = DatabaseHelper.instance;
-                await dbHelper.deleteEntry(entry.id!);
-                Navigator.pop(
-                    context, true); // Pass 'true' to indicate deletion
+                await dbHelper.deleteEntry(widget.entry.id!);
+                Navigator.pop(context, true);
               },
               icon: const Icon(Icons.delete_forever),
               label: const Text("Delete this entry"),
