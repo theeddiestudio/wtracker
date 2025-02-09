@@ -39,17 +39,26 @@ class DatabaseHelper {
         bwbg REAL,
         bwag REAL,
         bwslp REAL,
-        bwday REAL
+        bwday REAL,
+        bwwk REAL
       )
     ''');
   }
 
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute(
+          'ALTER TABLE weight_entries ADD COLUMN bwwk REAL DEFAULT 0.0');
+    }
+  }
+
   Future<int> insertWeightEntry(WeightEntry entry) async {
     final db = await database;
+    await updateWeekAverages(entry.date); // Update bwwk for the week
     return await db.insert(
       'weight_entries',
       entry.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace, // Prevent duplicates
+      conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
@@ -114,6 +123,47 @@ class DatabaseHelper {
     await db.delete('weight_entries');
   }
 
+  Future<double> updateWeekAverages(String date) async {
+    final db = await database;
+    DateTime targetDate = DateTime.parse(date);
+    DateTime sunday =
+        targetDate.subtract(Duration(days: targetDate.weekday % 7));
+
+    // Fetch all entries for the week (from Sunday to targetDate)
+    List<Map<String, dynamic>> result = await db.query(
+      'weight_entries',
+      where: 'date BETWEEN ? AND ?',
+      whereArgs: [sunday.toIso8601String().substring(0, 10), date],
+      orderBy: 'date ASC',
+    );
+
+    // Calculate the average bwday for the week, ignoring days with bwday = 0
+    List<double> validWeights = [];
+    for (var row in result) {
+      double weight = row['bwday'] ?? 0.0;
+      if (weight > 0) {
+        validWeights.add(weight);
+      }
+    }
+
+    double bwwk = validWeights.isNotEmpty
+        ? validWeights.reduce((a, b) => a + b) / validWeights.length
+        : 0.0;
+
+    // Update bwwk for all days in the week
+    for (var row in result) {
+      await db.update(
+        'weight_entries',
+        {'bwwk': bwwk},
+        where: 'date = ?',
+        whereArgs: [row['date']],
+      );
+    }
+
+    // Return the calculated bwwk value
+    return bwwk;
+  }
+
   // Fetch all weight entries sorted by date (newest first)
   Future<List<WeightEntry>> getWeightHistory() async {
     final db = await database;
@@ -131,6 +181,24 @@ class DatabaseHelper {
       );
     });
   }
+
+  /* Future<List<WeightEntry>> getWeightHistory(int days) async {
+    final db = await database;
+    final today = DateTime.now();
+    final startDate = today.subtract(Duration(days: days - 1));
+
+    final maps = await db.query(
+      'weight_entries',
+      where: 'date BETWEEN ? AND ?',
+      whereArgs: [
+        startDate.toIso8601String().substring(0, 10),
+        today.toIso8601String().substring(0, 10)
+      ],
+      orderBy: 'date ASC',
+    );
+
+    return maps.map((map) => WeightEntry.fromMap(map)).toList();
+  } */
 
   // Delete a specific weight entry by ID
   Future<void> deleteEntry(int id) async {

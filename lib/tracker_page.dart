@@ -90,17 +90,43 @@ class _TrackerPageState extends State<TrackerPage> {
   // Save data to the database
   Future<void> _saveData() async {
     final dbHelper = DatabaseHelper.instance;
+
+    // Calculate bwday
+    double? bwday = _calculateBwDay();
+
+    // Create the WeightEntry object
     final entry = WeightEntry(
       date: _currentDate.toLocal().toString().split(' ')[0],
       bwmrg: double.tryParse(_bwmrgController.text),
       bwbg: double.tryParse(_bwbgController.text),
       bwag: double.tryParse(_bwagController.text),
       bwslp: double.tryParse(_bwslpController.text),
-      bwday: _calculateBwDay(),
+      bwday: bwday,
     );
+
+    // Insert the entry into the database
     await dbHelper.insertWeightEntry(entry);
+
+    // Calculate and update bwwk for the week
+    double bwwk = await dbHelper.updateWeekAverages(entry.date);
+
+    // Update the WeightEntry object with the new bwwk value
+    final updatedEntry = WeightEntry(
+      id: entry.id,
+      date: entry.date,
+      bwmrg: entry.bwmrg,
+      bwbg: entry.bwbg,
+      bwag: entry.bwag,
+      bwslp: entry.bwslp,
+      bwday: entry.bwday,
+      bwwk: bwwk,
+    );
+
+    // Update the entry in the database with the new bwwk value
+    await dbHelper.insertWeightEntry(updatedEntry);
+
+    // Update the UI state
     setState(() {
-      // After saving data, ensure the ignored flag is updated
       _ignoreBwmrg = _bwmrgController.text.isEmpty;
       _ignoreBwbg = _bwbgController.text.isEmpty;
       _ignoreBwag = _bwagController.text.isEmpty;
@@ -150,6 +176,13 @@ class _TrackerPageState extends State<TrackerPage> {
         _ignoreBwslp = value;
       }
     });
+  }
+
+  Future<double?> _getBwwkForWeek() async {
+    final dbHelper = DatabaseHelper.instance;
+    final entry = await dbHelper
+        .getWeightEntry(_currentDate.toLocal().toString().split(' ')[0]);
+    return entry?.bwwk;
   }
 
   @override
@@ -223,6 +256,24 @@ class _TrackerPageState extends State<TrackerPage> {
           Text(
             'Today\'s Weight: ${_calculateBwDay()?.toStringAsFixed(2) ?? "X"}',
             style: const TextStyle(fontSize: 16),
+          ),
+
+          // Week's average
+          FutureBuilder<double?>(
+            future: _getBwwkForWeek(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else {
+                return Text(
+                  'Week\'s Average: ${snapshot.data?.toStringAsFixed(2) ?? "X"}',
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
+                );
+              }
+            },
           ),
 
           const SizedBox(height: 20),
