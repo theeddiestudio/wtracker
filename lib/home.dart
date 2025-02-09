@@ -8,6 +8,7 @@ import 'tracker_page.dart';
 import 'history_page.dart';
 import 'graph_page.dart';
 import 'settings_page.dart';
+import 'mw_graph.dart';
 
 class ThemeProvider with ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
@@ -46,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
     TrackerPage(),
     HistoryPage(),
     GraphPage(),
+    MWGraphPage(),
     SettingsPage(),
   ];
 
@@ -182,12 +184,21 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Settings'),
+              leading: const Icon(Icons.show_chart),
+              title: const Text('MW Graph'),
               selected: _selectedIndex == 3,
               onTap: () {
                 Navigator.pop(context); // Close the drawer
                 _onItemTapped(3);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Settings'),
+              selected: _selectedIndex == 4,
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+                _onItemTapped(4);
               },
             ),
           ],

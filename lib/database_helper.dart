@@ -62,6 +62,30 @@ class DatabaseHelper {
     );
   }
 
+  Future<List<WeightEntry>> getMWGraphData(int maxWeeks) async {
+    final db = await database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      'weight_entries',
+      columns: ['bwwk', 'date'],
+      orderBy: 'date DESC',
+      limit: maxWeeks * 7, // To check up to 7 days per week
+    );
+
+    List<WeightEntry> weeks = [];
+    Set<int> seenWeeks = {};
+
+    for (var map in maps) {
+      int weekNumber = DateTime.parse(map['date']).weekday;
+      if (!seenWeeks.contains(weekNumber)) {
+        seenWeeks.add(weekNumber);
+        weeks.add(WeightEntry.fromMap(map));
+      }
+      if (weeks.length >= maxWeeks) break;
+    }
+
+    return weeks;
+  }
+
   Future<WeightEntry?> getWeightEntry(String date) async {
     final db = await database;
     final maps = await db.query(
@@ -150,7 +174,9 @@ class DatabaseHelper {
         .toList();
 
     double bwwk = validWeights.isNotEmpty
-        ? validWeights.reduce((a, b) => a + b) / validWeights.length
+        ? double.parse(
+            (validWeights.reduce((a, b) => a + b) / validWeights.length)
+                .toStringAsFixed(2))
         : 0.0;
 
     // Ensure bwwk is updated for all days in the week (even missing ones)
