@@ -3,7 +3,7 @@ description: A weight tracking app.
 
 publish_to: 'none' # Remove this line if you want to publish to pub.dev
 
-version: 1.2.1+1
+version: 1.2.2+1
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -38,10 +38,11 @@ flutter:
 
 flutter_native_splash:
   color: "#2E2E2E"  # Greyish background
-  image: assets/logo.png  # Your logo (use a high-res version)
+  background_image: assets/logo.png  # Use background_image instead of image
   android: true
   ios: true
   fullscreen: true
   android_12:
-    image: assets/logo.png  # Android 12+ support
+    background_image: assets/logo.png  # Fix for Android 12+
     color: "#2E2E2E"
+
