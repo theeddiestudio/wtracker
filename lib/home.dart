@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Initialize the app, request permissions, and then load settings
   Future<void> _initializeApp() async {
-    await _requestPermissions(); // Wait for permissions first
+    // await _requestPermissions(); // Wait for permissions first
     await _initializeSettings(); // Then initialize settings
     await _checkAndRequestNotificationPermission();
   }
