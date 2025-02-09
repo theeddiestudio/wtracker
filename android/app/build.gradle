@@ -46,16 +46,16 @@ android {
 
     signingConfigs {
         debug {
-            storeFile file("key.jks")  // Relative path for debug keystore
-            storePassword "adk123"
-            keyAlias "tes"
-            keyPassword "adk123"
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
         }
         release {
-            storeFile file("key.jks")  // Relative path for release keystore
-            storePassword "adk123"
-            keyAlias "tes"
-            keyPassword "adk123"
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
         }
     }
 

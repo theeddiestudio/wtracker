@@ -10,6 +10,7 @@ key.properties
 
 # Log/OS Files
 *.log
+*.zip
 
 # Android Studio generated files and folders
 captures/

@@ -25,7 +25,9 @@ class WeightEntry {
       'bwbg': bwbg,
       'bwag': bwag,
       'bwslp': bwslp,
-      'bwday': bwday,
+      'bwday': bwday != null
+          ? double.parse(bwday!.toStringAsFixed(bwday! * 10 % 10 == 0 ? 1 : 2))
+          : null, // Format bwday correctly
     };
   }
 
