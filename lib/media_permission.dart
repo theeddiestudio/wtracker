@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'home.dart'; // Import the tracker page
+import 'home.dart';
 
 class MediaPermissionScreen extends StatefulWidget {
   @override
@@ -25,18 +25,6 @@ class _MediaPermissionScreenState extends State<MediaPermissionScreen> {
     _goToHomePage();
   }
 
-  Future<void> _requestPermission() async {
-    var result = await Permission.photos.request();
-    if (result.isGranted) {
-      _goToHomePage();
-    } else {
-      // If denied, show a message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Media permission is required to continue.")),
-      );
-    }
-  }
-
   void _goToHomePage() {
     Navigator.pushReplacement(
       context,
@@ -47,14 +35,18 @@ class _MediaPermissionScreenState extends State<MediaPermissionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color(0xFF2E2E2E), // Match splash background color
       body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(), // Loading while checking permissions
-            SizedBox(height: 20),
-            Text("You need access to all files."),
-          ],
+        child: SizedBox(
+          width: 160, // Force image size
+          height: 160, // Force image size
+          child: Image.asset(
+            'assets/logo.png',
+            fit: BoxFit.contain, // Ensures it fits correctly
+            errorBuilder: (context, error, stackTrace) {
+              return const SizedBox(); // Hide if loading fails
+            },
+          ),
         ),
       ),
     );
