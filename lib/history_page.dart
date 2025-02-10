@@ -27,9 +27,12 @@ class _HistoryPageState extends State<HistoryPage> {
     });
   }
 
-  Future<void> _deleteEntry(int id) async {
+  Future<void> _deleteEntry(String entryDate, int id) async {
     final dbHelper = DatabaseHelper.instance;
+    final wkdbHelper = WeekDatabaseHelper.instance;
+
     await dbHelper.deleteEntry(id);
+    await wkdbHelper.insertOrUpdateWeekAverage(entryDate);
     _loadHistory();
   }
 
@@ -88,7 +91,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   },
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () => _deleteEntry(entry.id!),
+                    onPressed: () => _deleteEntry(entry.date, entry.id!),
                   ),
                 );
               },
