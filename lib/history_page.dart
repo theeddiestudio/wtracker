@@ -122,75 +122,22 @@ class _DetailPageState extends State<DetailPage> {
   }
 
   Future<void> _fetchBwwk() async {
-    final dbHelper = DatabaseHelper.instance;
-    final db = await dbHelper.database;
+    final weekDbHelper = WeekDatabaseHelper.instance;
+    String entryDate = widget.entry.date; // Use the entry's date
 
-    // Ensure date format is consistent
-    String entryDate = widget.entry.date; // Should be in 'YYYY-MM-DD' format
+    double? bwwk = await weekDbHelper.getWeekAverage(entryDate);
 
-    // Fetch the week range (df, dt) for this entry's date
-    List<Map<String, dynamic>> weekResult = await db.query(
-      'week_entries',
-      columns: ['df', 'dt', 'bwwk'],
-      where:
-          "date(?) BETWEEN df AND dt", // Ensure it falls within the week range
-      whereArgs: [entryDate],
-    );
-
-    if (weekResult.isNotEmpty) {
-      setState(() {
-        df = weekResult.first['df'];
-        dt = weekResult.first['dt'];
-        bwwk = weekResult.first['bwwk'];
-      });
-    } else {
-      setState(() {
-        bwwk = null; // Ensure UI updates properly
-      });
-    }
+    setState(() {
+      this.bwwk = bwwk ?? 0.0;
+    });
   }
 
   Future<void> _deleteEntryAndUpdateWeek() async {
     final dbHelper = WeekDatabaseHelper.instance;
-    final db = await dbHelper.database;
+    String entryDate = widget.entry.date;
 
-    // Delete the entry
     await dbHelper.deleteEntry(widget.entry.id!);
-
-    if (df != null && dt != null) {
-      // Recalculate `bwwk` for this df-dt range
-      List<Map<String, dynamic>> result = await db.query(
-        'weight_entries',
-        columns: ['bwday'],
-        where: 'date BETWEEN ? AND ? AND bwday IS NOT NULL',
-        whereArgs: [df, dt],
-      );
-
-      double newBwwk = 0;
-      int count = 0;
-
-      for (var row in result) {
-        double weight = row['bwday'];
-        if (weight > 0) {
-          newBwwk += weight;
-          count++;
-        }
-      }
-
-      if (count > 0) {
-        newBwwk /= count;
-      } else {
-        newBwwk = 0; // No valid data in the range
-      }
-
-      // Update the week average in week_entries
-      await db.update(
-        'week_entries',
-        {'bwwk': newBwwk},
-        where: 'df = ? AND dt = ?',
-        whereArgs: [df, dt],
-      );
-    }
+    await dbHelper.insertOrUpdateWeekAverage(entryDate);
 
     Navigator.pop(context, true);
   }

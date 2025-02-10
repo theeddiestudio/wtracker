@@ -39,6 +39,8 @@ class WeekDatabaseHelper {
 
     if (weekAverage == null) return; // Skip if no valid data
 
+    WeekEntry weekEntry = WeekEntry(df: dfStr, dt: dtStr, bwwk: weekAverage);
+
     // Check if this week already exists
     final List<Map<String, dynamic>> existingWeek = await db.query(
       'week_entries',
@@ -46,21 +48,11 @@ class WeekDatabaseHelper {
       whereArgs: [dfStr, dtStr],
     );
 
-    if (existingWeek.isNotEmpty) {
-      // Update existing week average
-      await db.update(
-        'week_entries',
-        {'bwwk': weekAverage},
-        where: 'df = ? AND dt = ?',
-        whereArgs: [dfStr, dtStr],
-      );
-    } else {
-      // Insert new week entry
-      await db.insert(
-        'week_entries',
-        {'df': dfStr, 'dt': dtStr, 'bwwk': weekAverage},
-      );
-    }
+    await db.insert(
+      'week_entries',
+      weekEntry.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 
   // Calculate weekly average weight for a given week range
