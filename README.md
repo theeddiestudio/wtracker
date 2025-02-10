@@ -96,7 +96,7 @@ flutter run
 | ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/history%20page/detail%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/history%20page/detail%20-%20dark%20mode.jpg?raw=true) |
 | Graph Page (Light) | Graph Page (Dark) |
 |--------------|-------------|
-| ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/graph%20page/history%20-%20graph%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/graph%20page/graph%20-%20dark%20mode.jpg?raw=true) |
+| ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/graph%20page/graph%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/graph%20page/graph%20-%20dark%20mode.jpg?raw=true) |
 | MW Graph Page (Light) | MW Graph Page (Dark) |
 |--------------|-------------|
 | ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/mw%20graph/mwgraph%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/mw%20graph/mwgraph%20-%20dark%20mode.jpg?raw=true) |
