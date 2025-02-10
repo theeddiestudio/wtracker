@@ -4,10 +4,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'graph_page.dart';
-import 'database_helper.dart';
-import 'weight_entry.dart';
+import 'wkdb_helper.dart'; // Use WeekDatabaseHelper
+import 'week_entry.dart';
 
-/* class MWGraphPage extends StatefulWidget {
+class MWGraphPage extends StatefulWidget {
   const MWGraphPage({super.key});
 
   @override
@@ -15,8 +15,7 @@ import 'weight_entry.dart';
 }
 
 class _MWGraphPageState extends State<MWGraphPage> {
-  List<WeightEntry> _entries = [];
-
+  List<WeekEntry> _entries = [];
   bool _showDots = true;
 
   @override
@@ -65,11 +64,76 @@ class _MWGraphPageState extends State<MWGraphPage> {
       });
     }
 
-    final dbHelper = DatabaseHelper.instance;
-    final entries = await dbHelper.getMWGraphData(4); // Get up to 8 weeks
+    final dbHelper = WeekDatabaseHelper.instance;
+    final entries = await _fetchMWGraphData();
     setState(() {
-      _entries = entries.reversed.toList();
+      _entries = entries;
     });
+  }
+
+  Future<List<WeekEntry>> _fetchMWGraphData() async {
+    final dbHelper = WeekDatabaseHelper.instance;
+    DateTime today = DateTime.now();
+
+    // Subtracting days to reach fourth week's Sunday (df)
+    int daysToSubtract = 21 + today.weekday;
+    DateTime df = today.subtract(Duration(days: daysToSubtract));
+    DateTime dt = df.add(Duration(days: 6));
+
+    List<WeekEntry> entries = [];
+
+    for (int i = 0; i < 4; i++) {
+      double? bwwk = await _getValidBwwk(df);
+
+      if (bwwk != null) {
+        entries.add(WeekEntry(
+            df: df.toIso8601String().substring(0, 10),
+            dt: dt.toIso8601String().substring(0, 10),
+            bwwk: bwwk));
+      }
+
+      df = df.add(const Duration(days: 7)); // Move to the next week
+    }
+
+    return entries.toList(); // Reverse to plot from oldest to newest
+  }
+
+  Future<double?> _getValidBwwk(DateTime df) async {
+    final dbHelper = WeekDatabaseHelper.instance;
+    double? bwwk;
+
+    // Try getting data for this df
+    bwwk = await dbHelper.getBwwkByDf(df.toIso8601String().substring(0, 10));
+
+    // If missing, find closest past week
+    if (bwwk == null) {
+      DateTime pastDf = df;
+      while (bwwk == null) {
+        pastDf = pastDf.subtract(const Duration(days: 7));
+        bwwk = await dbHelper
+            .getBwwkByDf(pastDf.toIso8601String().substring(0, 10));
+
+        if (pastDf.isBefore(DateTime(2000))) {
+          break; // Stop if it goes too far back
+        }
+      }
+    }
+
+    // If still missing, find closest future week
+    if (bwwk == null) {
+      DateTime futureDf = df;
+      while (bwwk == null) {
+        futureDf = futureDf.add(const Duration(days: 7));
+        bwwk = await dbHelper
+            .getBwwkByDf(futureDf.toIso8601String().substring(0, 10));
+
+        if (futureDf.isAfter(DateTime.now())) {
+          break; // Stop if it goes beyond today
+        }
+      }
+    }
+
+    return bwwk;
   }
 
   @override
@@ -102,7 +166,7 @@ class _MWGraphPageState extends State<MWGraphPage> {
                 builder: (context) => FullScreenGraph(chartData: chartData)),
           ),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10), // Add margin
+            padding: const EdgeInsets.symmetric(horizontal: 10),
             child: SizedBox(height: 300, child: LineChart(chartData)),
           ),
         ),
@@ -159,8 +223,7 @@ class _MWGraphPageState extends State<MWGraphPage> {
             getTitlesWidget: (value, _) {
               int index = value.toInt();
               if (index < 0 || index >= _entries.length) return Container();
-
-              int weekNumber = 4 - index; // Since we reversed the data
+              int weekNumber = 4 - index; // Since reversed
               return Text('$weekNumber');
             },
           ),
@@ -173,4 +236,4 @@ class _MWGraphPageState extends State<MWGraphPage> {
       gridData: FlGridData(show: true),
     );
   }
-} */
+}

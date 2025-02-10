@@ -22,6 +22,20 @@ class WeekDatabaseHelper {
     await DatabaseHelper.instance.createTables(db);
   }
 
+  Future<double?> getBwwkByDf(String df) async {
+    final db = await database;
+    List<Map<String, dynamic>> result = await db.query(
+      'week_entries',
+      columns: ['bwwk'],
+      where: 'df = ?',
+      whereArgs: [df],
+    );
+    if (result.isNotEmpty) {
+      return result.first['bwwk'] as double?;
+    }
+    return null;
+  }
+
   // Insert or update week average (calculates `bwwk` inside)
   Future<void> insertOrUpdateWeekAverage(String date) async {
     final db = await database;

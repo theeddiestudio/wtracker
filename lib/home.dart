@@ -8,7 +8,7 @@ import 'tracker_page.dart';
 import 'history_page.dart';
 import 'graph_page.dart';
 import 'settings_page.dart';
-// import 'mw_graph.dart';
+import 'mw_graph.dart';
 
 class ThemeProvider with ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
     TrackerPage(),
     HistoryPage(),
     GraphPage(),
-    // MWGraphPage(),
+    MWGraphPage(),
     SettingsPage(),
   ];
 
