@@ -143,7 +143,7 @@ class _GraphPageState extends State<GraphPage> {
 
   LineChartData _buildWeeklyChart() {
     final weeklyData = _getWeeklyData();
-    return _buildChartData(weeklyData, Colors.blue, 7, 0.5, 1);
+    return _buildChartData(weeklyData, Colors.yellow, 7, 0.5, 1);
   }
 
   LineChartData _buildMonthlyChart() {

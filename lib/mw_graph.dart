@@ -48,13 +48,6 @@ class _MWGraphPageState extends State<MWGraphPage> {
 
   Future<void> _loadMWGraphData() async {
     final path = await _getSettingsPath();
-    final prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey('enable_dots')) {
-      setState(() {
-        _showDots = prefs.getBool('enable_dots') ?? true;
-      });
-      return;
-    }
     final settingsFile = File(path);
     if (await settingsFile.exists()) {
       final jsonString = await settingsFile.readAsString();
@@ -64,7 +57,6 @@ class _MWGraphPageState extends State<MWGraphPage> {
       });
     }
 
-    final dbHelper = WeekDatabaseHelper.instance;
     final entries = await _fetchMWGraphData();
     setState(() {
       _entries = entries;
@@ -72,7 +64,6 @@ class _MWGraphPageState extends State<MWGraphPage> {
   }
 
   Future<List<WeekEntry>> _fetchMWGraphData() async {
-    final dbHelper = WeekDatabaseHelper.instance;
     DateTime today = DateTime.now();
 
     // Subtracting days to reach fourth week's Sunday (df)
@@ -203,7 +194,7 @@ class _MWGraphPageState extends State<MWGraphPage> {
         LineChartBarData(
           spots: spots,
           isCurved: false,
-          color: Colors.red,
+          color: Colors.teal,
           dotData: FlDotData(show: _showDots),
           belowBarData: BarAreaData(show: false),
         ),
