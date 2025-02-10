@@ -66,7 +66,7 @@ A **Flutter-based** weight tracking app designed for easy weight monitoring with
 ### **1️⃣ Clone the Repository**  
 ```sh
 git clone https://github.com/theeddiestudio/wtracker.git
-cd weight-tracker
+cd wtracker
 ```
 
 ### **2️⃣ Install Dependencies**  
@@ -85,9 +85,24 @@ flutter run
 
 ## 📷 **Screenshots**  
 
-| MW Graph Page | Tracker Page | History View |
-|--------------|-------------|--------------|
-| ![MW Graph](https://via.placeholder.com/250) | ![Tracker](https://via.placeholder.com/250) | ![History](https://via.placeholder.com/250) |
+| Tracker Page (Light) | Tracker Page (Dark) |
+|--------------|-------------|
+| ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/tracker%20page/tracker%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/tracker%20page/tracker%20-%20dark%20mode.jpg?raw=true) |
+| History Page (Light) | History Page (Dark) |
+|--------------|-------------|
+| ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/history%20page/history%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/history%20page/history%20-%20dark%20mode.jpg?raw=true) |
+| Detailed View (Light) | Detailed View (Dark) |
+|--------------|-------------|
+| ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/history%20page/detail%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/history%20page/detail%20-%20dark%20mode.jpg?raw=true) |
+| Graph Page (Light) | Graph Page (Dark) |
+|--------------|-------------|
+| ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/graph%20page/history%20-%20graph%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/graph%20page/graph%20-%20dark%20mode.jpg?raw=true) |
+| MW Graph Page (Light) | MW Graph Page (Dark) |
+|--------------|-------------|
+| ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/mw%20graph/mwgraph%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/mw%20graph/mwgraph%20-%20dark%20mode.jpg?raw=true) |
+| Settings Page (Light) | Settings Page (Dark) |
+|--------------|-------------|
+| ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/settings%20page/settings%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/settings%20page/settings%20-%20dark%20mode.jpg?raw=true) |
 
 More previews available in the **[Screenshots Folder](https://github.com/theeddiestudio/wtracker/screenshots)**  
 
@@ -103,7 +118,7 @@ More previews available in the **[Screenshots Folder](https://github.com/theeddi
 
 ## 🤝 **Contributing**  
 
-Want to improve this project? Check out the **[Contributing Guidelines](https://github.com/your-repo-name/CONTRIBUTING.md)**  
+Want to improve this project? Check out the **[Contributing Guidelines](https://github.com/theeddiestudio/wtracker/CONTRIBUTING.md)**  
 
 🔹 **Fork the repository**  
 🔹 **Create a feature branch** (`git checkout -b feature-name`)  
