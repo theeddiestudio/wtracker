@@ -212,24 +212,6 @@ class DatabaseHelper {
     });
   }
 
-  /* Future<List<WeightEntry>> getWeightHistory(int days) async {
-    final db = await database;
-    final today = DateTime.now();
-    final startDate = today.subtract(Duration(days: days - 1));
-
-    final maps = await db.query(
-      'weight_entries',
-      where: 'date BETWEEN ? AND ?',
-      whereArgs: [
-        startDate.toIso8601String().substring(0, 10),
-        today.toIso8601String().substring(0, 10)
-      ],
-      orderBy: 'date ASC',
-    );
-
-    return maps.map((map) => WeightEntry.fromMap(map)).toList();
-  } */
-
   // Delete a specific weight entry by ID
   Future<void> deleteEntry(int id) async {
     final db = await database;

@@ -158,22 +158,22 @@ class _DetailPageState extends State<DetailPage> {
             const Divider(thickness: 2), // Horizontal line
             const SizedBox(height: 8),
             Text(
-              'Morning Weight: ${_getValueOrX(widget.entry.bwmrg, widget.entry.bwmrg == null)} kg',
+              'Morning: ${_getValueOrX(widget.entry.bwmrg, widget.entry.bwmrg == null)} kg',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),
             Text(
-              'Before Gym: ${_getValueOrX(widget.entry.bwbg, widget.entry.bwbg == null)} kg',
+              'Afternoon: ${_getValueOrX(widget.entry.bwbg, widget.entry.bwbg == null)} kg',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),
             Text(
-              'After Gym: ${_getValueOrX(widget.entry.bwag, widget.entry.bwag == null)} kg',
+              'Evening: ${_getValueOrX(widget.entry.bwag, widget.entry.bwag == null)} kg',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),
             Text(
-              'Before Sleep: ${_getValueOrX(widget.entry.bwslp, widget.entry.bwslp == null)} kg',
+              'Night: ${_getValueOrX(widget.entry.bwslp, widget.entry.bwslp == null)} kg',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 8),

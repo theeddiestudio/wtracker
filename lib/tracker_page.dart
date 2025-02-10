@@ -245,12 +245,10 @@ class _TrackerPageState extends State<TrackerPage> {
           const SizedBox(height: 20),
 
           // Weight inputs and ignore cross buttons
-          _buildWeightInput(
-              'Morning Weight', _bwmrgController, _ignoreBwmrg, 'bwmrg'),
-          _buildWeightInput('Before Gym', _bwbgController, _ignoreBwbg, 'bwbg'),
-          _buildWeightInput('After Gym', _bwagController, _ignoreBwag, 'bwag'),
-          _buildWeightInput(
-              'Before Sleep', _bwslpController, _ignoreBwslp, 'bwslp'),
+          _buildWeightInput('Morning', _bwmrgController, _ignoreBwmrg, 'bwmrg'),
+          _buildWeightInput('Afternoon', _bwbgController, _ignoreBwbg, 'bwbg'),
+          _buildWeightInput('Evening', _bwagController, _ignoreBwag, 'bwag'),
+          _buildWeightInput('Night', _bwslpController, _ignoreBwslp, 'bwslp'),
 
           const SizedBox(height: 10),
           const Divider(thickness: 2),
