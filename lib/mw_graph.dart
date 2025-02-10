@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'graph_page.dart';
-import 'wkdb_helper.dart'; // Use WeekDatabaseHelper
+import 'wkdb_helper.dart';
 import 'week_entry.dart';
 
 class MWGraphPage extends StatefulWidget {
@@ -26,105 +25,90 @@ class _MWGraphPageState extends State<MWGraphPage> {
 
   Future<String> _getSettingsPath() async {
     final dir = Directory('/storage/emulated/0/.wtracker/settings');
-    if (!await dir.exists()) {
-      await dir.create(recursive: true);
-      await _saveSettings('enable_dots', true);
-    }
+    if (!await dir.exists()) await dir.create(recursive: true);
     return '${dir.path}/settings.json';
   }
 
-  Future<void> _saveSettings(String key, dynamic value) async {
-    final path = await _getSettingsPath();
-    final settingsFile = File(path);
-
-    Map<String, dynamic> settings = {};
-    if (await settingsFile.exists()) {
-      settings = jsonDecode(await settingsFile.readAsString());
-    }
-
-    settings[key] = value;
-    await settingsFile.writeAsString(jsonEncode(settings));
-  }
-
   Future<void> _loadMWGraphData() async {
-    final path = await _getSettingsPath();
-    final settingsFile = File(path);
-    if (await settingsFile.exists()) {
-      final jsonString = await settingsFile.readAsString();
-      final settings = jsonDecode(jsonString);
-      setState(() {
-        _showDots = settings['enable_dots'] ?? true;
-      });
-    }
+    final dbHelper = WeekDatabaseHelper.instance;
 
-    final entries = await _fetchMWGraphData();
+    // Load settings and MW graph data in parallel
+    final settingsFuture = _loadSettings();
+    final entriesFuture = dbHelper.getMWGraphData(4);
+
+    final results = await Future.wait([settingsFuture, entriesFuture]);
+
     setState(() {
-      _entries = entries;
+      _showDots = results[0] as bool;
+      _entries = _fillMissingWeeks(results[1] as List<Map<String, dynamic>>);
     });
   }
 
-  Future<List<WeekEntry>> _fetchMWGraphData() async {
-    DateTime today = DateTime.now();
+  Future<bool> _loadSettings() async {
+    try {
+      final path = await _getSettingsPath();
+      final settingsFile = File(path);
+      if (await settingsFile.exists()) {
+        final settings = jsonDecode(await settingsFile.readAsString());
+        return settings['enable_dots'] ?? true;
+      }
+    } catch (e) {
+      print("Error loading settings: $e");
+    }
+    return true;
+  }
 
-    // Subtracting days to reach fourth week's Sunday (df)
+  List<WeekEntry> _fillMissingWeeks(List<Map<String, dynamic>> weeks) {
+    DateTime today = DateTime.now();
     int daysToSubtract = 21 + today.weekday;
     DateTime df = today.subtract(Duration(days: daysToSubtract));
-    DateTime dt = df.add(Duration(days: 6));
 
-    List<WeekEntry> entries = [];
+    List<WeekEntry> filledEntries = [];
+    Map<String, double> weekMap = {
+      for (var week in weeks) week['df']: week['bwwk']
+    };
 
     for (int i = 0; i < 4; i++) {
-      double? bwwk = await _getValidBwwk(df);
+      String dfStr = df.toIso8601String().substring(0, 10);
+      double? bwwk = weekMap[dfStr];
+
+      // Find closest valid week in-memory (no extra DB calls)
+      if (bwwk == null) {
+        bwwk = _findClosestBwwk(weekMap, df);
+      }
 
       if (bwwk != null) {
-        entries.add(WeekEntry(
-            df: df.toIso8601String().substring(0, 10),
-            dt: dt.toIso8601String().substring(0, 10),
+        filledEntries.add(WeekEntry(
+            df: dfStr,
+            dt: df.add(Duration(days: 6)).toIso8601String().substring(0, 10),
             bwwk: bwwk));
       }
 
-      df = df.add(const Duration(days: 7)); // Move to the next week
+      df = df.add(Duration(days: 7));
     }
 
-    return entries.toList(); // Reverse to plot from oldest to newest
+    return filledEntries;
   }
 
-  Future<double?> _getValidBwwk(DateTime df) async {
-    final dbHelper = WeekDatabaseHelper.instance;
-    double? bwwk;
+  double? _findClosestBwwk(Map<String, double> weekMap, DateTime df) {
+    DateTime pastDf = df;
+    DateTime futureDf = df;
 
-    // Try getting data for this df
-    bwwk = await dbHelper.getBwwkByDf(df.toIso8601String().substring(0, 10));
+    while (true) {
+      pastDf = pastDf.subtract(Duration(days: 7));
+      futureDf = futureDf.add(Duration(days: 7));
 
-    // If missing, find closest past week
-    if (bwwk == null) {
-      DateTime pastDf = df;
-      while (bwwk == null) {
-        pastDf = pastDf.subtract(const Duration(days: 7));
-        bwwk = await dbHelper
-            .getBwwkByDf(pastDf.toIso8601String().substring(0, 10));
-
-        if (pastDf.isBefore(DateTime(2000))) {
-          break; // Stop if it goes too far back
-        }
+      if (weekMap.containsKey(pastDf.toIso8601String().substring(0, 10))) {
+        return weekMap[pastDf.toIso8601String().substring(0, 10)];
+      }
+      if (weekMap.containsKey(futureDf.toIso8601String().substring(0, 10))) {
+        return weekMap[futureDf.toIso8601String().substring(0, 10)];
+      }
+      if (pastDf.isBefore(DateTime(2000)) && futureDf.isAfter(DateTime.now())) {
+        break;
       }
     }
-
-    // If still missing, find closest future week
-    if (bwwk == null) {
-      DateTime futureDf = df;
-      while (bwwk == null) {
-        futureDf = futureDf.add(const Duration(days: 7));
-        bwwk = await dbHelper
-            .getBwwkByDf(futureDf.toIso8601String().substring(0, 10));
-
-        if (futureDf.isAfter(DateTime.now())) {
-          break; // Stop if it goes beyond today
-        }
-      }
-    }
-
-    return bwwk;
+    return null;
   }
 
   @override
@@ -180,7 +164,7 @@ class _MWGraphPageState extends State<MWGraphPage> {
     double? lastValidY;
 
     for (int i = 0; i < _entries.length; i++) {
-      final double yValue = _entries[i].bwwk ?? 0.0;
+      final double yValue = _entries[i].bwwk;
       if (yValue > 0) {
         spots.add(FlSpot(i.toDouble(), yValue));
         lastValidY = yValue;
@@ -207,6 +191,9 @@ class _MWGraphPageState extends State<MWGraphPage> {
             getTitlesWidget: (value, _) => Text(value.toStringAsFixed(1)),
           ),
         ),
+        rightTitles:
+            const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
@@ -214,14 +201,10 @@ class _MWGraphPageState extends State<MWGraphPage> {
             getTitlesWidget: (value, _) {
               int index = value.toInt();
               if (index < 0 || index >= _entries.length) return Container();
-              int weekNumber = 4 - index; // Since reversed
-              return Text('$weekNumber');
+              return Text('${4 - index}');
             },
           ),
         ),
-        rightTitles:
-            const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
       ),
       borderData: FlBorderData(show: true),
       gridData: FlGridData(show: true),
