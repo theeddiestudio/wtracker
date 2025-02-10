@@ -6,7 +6,6 @@ class WeightEntry {
   double? bwag;
   double? bwslp;
   double? bwday;
-  double? bwwk;
 
   WeightEntry({
     this.id,
@@ -16,7 +15,6 @@ class WeightEntry {
     this.bwag,
     this.bwslp,
     this.bwday,
-    this.bwwk,
   });
 
   Map<String, dynamic> toMap() {
@@ -29,10 +27,7 @@ class WeightEntry {
       'bwslp': bwslp,
       'bwday': bwday != null
           ? double.parse(bwday!.toStringAsFixed(bwday! * 10 % 10 == 0 ? 1 : 2))
-          : null, // Format bwday correctly
-      'bwwk': bwwk != null
-          ? double.parse(bwwk!.toStringAsFixed(bwwk! * 10 % 10 == 0 ? 1 : 2))
-          : null, // Format bwwk correctly
+          : null,
     };
   }
 
@@ -45,7 +40,6 @@ class WeightEntry {
       bwag: map['bwag'],
       bwslp: map['bwslp'],
       bwday: map['bwday'],
-      bwwk: map['bwwk'],
     );
   }
 }

@@ -12,6 +12,48 @@ class DatabaseHelper {
   Future<Database> get database async {
     if (_database != null) return _database!;
 
+    final dbPath = await getDatabasePath();
+
+    _database = await openDatabase(dbPath, version: 1, onCreate: _onCreate);
+    return _database!;
+  }
+
+  Future<void> _onCreate(Database db, int version) async {
+    await createTables(db);
+  }
+
+  Future<void> createTables(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS weight_entries (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date TEXT UNIQUE,
+        bwmrg REAL,
+        bwbg REAL,
+        bwag REAL,
+        bwslp REAL,
+        bwday REAL
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS week_entries (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        df TEXT UNIQUE,  -- First past Sunday
+        dt TEXT UNIQUE,  -- First future Saturday
+        bwwk REAL
+      )
+    ''');
+  }
+
+  Future<int> insertWeightEntry(WeightEntry entry) async {
+    final db = await database;
+    return await db.insert(
+      'weight_entries',
+      entry.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  Future<String> getDatabasePath() async {
     final prefs = await SharedPreferences.getInstance();
     String? saveLocation = prefs.getString('save_location');
 
@@ -26,64 +68,7 @@ class DatabaseHelper {
 
     final dbPath = '${directory.path}/weight_tracker.db';
 
-    _database = await openDatabase(dbPath, version: 1, onCreate: _onCreate);
-    return _database!;
-  }
-
-  Future<void> _onCreate(Database db, int version) async {
-    await db.execute('''
-      CREATE TABLE weight_entries (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        date TEXT UNIQUE,
-        bwmrg REAL,
-        bwbg REAL,
-        bwag REAL,
-        bwslp REAL,
-        bwday REAL,
-        bwwk REAL
-      )
-    ''');
-  }
-
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion < 2) {
-      await db.execute(
-          'ALTER TABLE weight_entries ADD COLUMN bwwk REAL DEFAULT 0.0');
-    }
-  }
-
-  Future<int> insertWeightEntry(WeightEntry entry) async {
-    final db = await database;
-    await updateWeekAverages(entry.date); // Update bwwk for the week
-    return await db.insert(
-      'weight_entries',
-      entry.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
-
-  Future<List<WeightEntry>> getMWGraphData(int maxWeeks) async {
-    final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      'weight_entries',
-      columns: ['bwwk', 'date'],
-      orderBy: 'date DESC',
-      limit: maxWeeks * 7, // To check up to 7 days per week
-    );
-
-    List<WeightEntry> weeks = [];
-    Set<int> seenWeeks = {};
-
-    for (var map in maps) {
-      int weekNumber = DateTime.parse(map['date']).weekday;
-      if (!seenWeeks.contains(weekNumber)) {
-        seenWeeks.add(weekNumber);
-        weeks.add(WeightEntry.fromMap(map));
-      }
-      if (weeks.length >= maxWeeks) break;
-    }
-
-    return weeks;
+    return dbPath;
   }
 
   Future<WeightEntry?> getWeightEntry(String date) async {
@@ -147,53 +132,6 @@ class DatabaseHelper {
     await db.delete('weight_entries');
   }
 
-  Future<double> updateWeekAverages(String date) async {
-    final db = await database;
-    DateTime targetDate = DateTime.parse(date);
-
-    // Find the full week range (Sunday to Saturday)
-    DateTime sunday = targetDate.subtract(
-        Duration(days: targetDate.weekday == 7 ? 0 : targetDate.weekday));
-    DateTime saturday = sunday.add(Duration(days: 6));
-
-    // Fetch all weight entries within the full week range
-    List<Map<String, dynamic>> result = await db.query(
-      'weight_entries',
-      where: 'date BETWEEN ? AND ?',
-      whereArgs: [
-        sunday.toIso8601String().substring(0, 10),
-        saturday.toIso8601String().substring(0, 10)
-      ],
-      orderBy: 'date ASC',
-    );
-
-    // Calculate bwwk using all days in the week, ignoring bwday = 0
-    List<double> validWeights = result
-        .map((row) => row['bwday'] as double? ?? 0.0)
-        .where((bw) => bw > 0)
-        .toList();
-
-    double bwwk = validWeights.isNotEmpty
-        ? double.parse(
-            (validWeights.reduce((a, b) => a + b) / validWeights.length)
-                .toStringAsFixed(2))
-        : 0.0;
-
-    // Ensure bwwk is updated for all days in the week (even missing ones)
-    for (int i = 0; i < 7; i++) {
-      String currentDate =
-          sunday.add(Duration(days: i)).toIso8601String().substring(0, 10);
-      await db.update(
-        'weight_entries',
-        {'bwwk': bwwk},
-        where: 'date = ?',
-        whereArgs: [currentDate],
-      );
-    }
-
-    return bwwk;
-  }
-
   // Fetch all weight entries sorted by date (newest first)
   Future<List<WeightEntry>> getWeightHistory() async {
     final db = await database;
@@ -223,5 +161,6 @@ class DatabaseHelper {
     final db = await database;
     await db.delete(
         'weight_entries'); // Deletes all rows from the weight_entries table
+    await db.delete('week_entries');
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'database_helper.dart';
+import 'wkdb_helper.dart';
 import 'weight_entry.dart';
 
 class HistoryPage extends StatefulWidget {
@@ -112,6 +113,7 @@ class DetailPage extends StatefulWidget {
 
 class _DetailPageState extends State<DetailPage> {
   double? bwwk;
+  int? df, dt; // Store week range for recalculation
 
   @override
   void initState() {
@@ -123,18 +125,74 @@ class _DetailPageState extends State<DetailPage> {
     final dbHelper = DatabaseHelper.instance;
     final db = await dbHelper.database;
 
-    List<Map<String, dynamic>> result = await db.query(
-      'weight_entries',
-      columns: ['bwwk'],
-      where: 'id = ?',
-      whereArgs: [widget.entry.id],
+    // Ensure date format is consistent
+    String entryDate = widget.entry.date; // Should be in 'YYYY-MM-DD' format
+
+    // Fetch the week range (df, dt) for this entry's date
+    List<Map<String, dynamic>> weekResult = await db.query(
+      'week_entries',
+      columns: ['df', 'dt', 'bwwk'],
+      where:
+          "date(?) BETWEEN df AND dt", // Ensure it falls within the week range
+      whereArgs: [entryDate],
     );
 
-    if (result.isNotEmpty) {
+    if (weekResult.isNotEmpty) {
       setState(() {
-        bwwk = result.first['bwwk'];
+        df = weekResult.first['df'];
+        dt = weekResult.first['dt'];
+        bwwk = weekResult.first['bwwk'];
+      });
+    } else {
+      setState(() {
+        bwwk = null; // Ensure UI updates properly
       });
     }
+  }
+
+  Future<void> _deleteEntryAndUpdateWeek() async {
+    final dbHelper = WeekDatabaseHelper.instance;
+    final db = await dbHelper.database;
+
+    // Delete the entry
+    await dbHelper.deleteEntry(widget.entry.id!);
+
+    if (df != null && dt != null) {
+      // Recalculate `bwwk` for this df-dt range
+      List<Map<String, dynamic>> result = await db.query(
+        'weight_entries',
+        columns: ['bwday'],
+        where: 'date BETWEEN ? AND ? AND bwday IS NOT NULL',
+        whereArgs: [df, dt],
+      );
+
+      double newBwwk = 0;
+      int count = 0;
+
+      for (var row in result) {
+        double weight = row['bwday'];
+        if (weight > 0) {
+          newBwwk += weight;
+          count++;
+        }
+      }
+
+      if (count > 0) {
+        newBwwk /= count;
+      } else {
+        newBwwk = 0; // No valid data in the range
+      }
+
+      // Update the week average in week_entries
+      await db.update(
+        'week_entries',
+        {'bwwk': newBwwk},
+        where: 'df = ? AND dt = ?',
+        whereArgs: [df, dt],
+      );
+    }
+
+    Navigator.pop(context, true);
   }
 
   String _getValueOrX(double? value, bool isIgnored) {
@@ -190,11 +248,7 @@ class _DetailPageState extends State<DetailPage> {
             ),
             const SizedBox(height: 20),
             FloatingActionButton.extended(
-              onPressed: () async {
-                final dbHelper = DatabaseHelper.instance;
-                await dbHelper.deleteEntry(widget.entry.id!);
-                Navigator.pop(context, true);
-              },
+              onPressed: _deleteEntryAndUpdateWeek,
               icon: const Icon(Icons.delete_forever),
               label: const Text("Delete this entry"),
               backgroundColor: Colors.red,

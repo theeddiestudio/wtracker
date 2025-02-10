@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'database_helper.dart';
+import 'wkdb_helper.dart';
 import 'weight_entry.dart';
 
 // Placeholder pages for now
@@ -90,6 +91,7 @@ class _TrackerPageState extends State<TrackerPage> {
   // Save data to the database
   Future<void> _saveData() async {
     final dbHelper = DatabaseHelper.instance;
+    final weekDbHelper = WeekDatabaseHelper.instance;
 
     // Calculate bwday
     double? bwday = _calculateBwDay();
@@ -108,22 +110,7 @@ class _TrackerPageState extends State<TrackerPage> {
     await dbHelper.insertWeightEntry(entry);
 
     // Calculate and update bwwk for the week
-    double bwwk = await dbHelper.updateWeekAverages(entry.date);
-
-    // Update the WeightEntry object with the new bwwk value
-    final updatedEntry = WeightEntry(
-      id: entry.id,
-      date: entry.date,
-      bwmrg: entry.bwmrg,
-      bwbg: entry.bwbg,
-      bwag: entry.bwag,
-      bwslp: entry.bwslp,
-      bwday: entry.bwday,
-      bwwk: bwwk,
-    );
-
-    // Update the entry in the database with the new bwwk value
-    await dbHelper.insertWeightEntry(updatedEntry);
+    await weekDbHelper.insertOrUpdateWeekAverage(entry.date);
 
     // Update the UI state
     setState(() {
@@ -179,10 +166,9 @@ class _TrackerPageState extends State<TrackerPage> {
   }
 
   Future<double?> _getBwwkForWeek() async {
-    final dbHelper = DatabaseHelper.instance;
-    final entry = await dbHelper
-        .getWeightEntry(_currentDate.toLocal().toString().split(' ')[0]);
-    return entry?.bwwk;
+    final weekDbHelper = WeekDatabaseHelper.instance;
+    return await weekDbHelper
+        .getWeekAverage(_currentDate.toLocal().toString().split(' ')[0]);
   }
 
   @override

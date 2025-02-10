@@ -7,7 +7,7 @@ import 'graph_page.dart';
 import 'database_helper.dart';
 import 'weight_entry.dart';
 
-class MWGraphPage extends StatefulWidget {
+/* class MWGraphPage extends StatefulWidget {
   const MWGraphPage({super.key});
 
   @override
@@ -173,4 +173,4 @@ class _MWGraphPageState extends State<MWGraphPage> {
       gridData: FlGridData(show: true),
     );
   }
-}
+} */
