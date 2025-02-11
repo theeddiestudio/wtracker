@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math';
+import 'database_helper.dart';
 import 'bfdb_helper.dart'; // Import new helper
 import 'fat_entry.dart';
 
@@ -35,13 +36,15 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
 
   Future<void> _loadSavedData() async {
     final fatDbHelper = FatEntryDatabaseHelper.instance;
+    final dbHelper = DatabaseHelper.instance;
+
     final entry = await fatDbHelper
         .getFatEntry(_currentDate.toLocal().toString().split(' ')[0]);
 
     final prefs = await SharedPreferences.getInstance();
     double? sharedPrefHeight = prefs.getDouble('height');
 
-    double? bwday = await fatDbHelper
+    double? bwday = await dbHelper
         .getBwday(_currentDate.toLocal().toString().split(' ')[0]);
 
     setState(() {
@@ -54,15 +57,15 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
         _hip = entry.hip;
         _bodyFat = entry.bodyFat;
 
-        _heightController.text =
-            _height?.toString() ?? sharedPrefHeight?.toString() ?? '';
-        _weightController.text = _weight?.toString() ?? bwday?.toString() ?? '';
+        _heightController.text = _height?.toString() ?? '';
+        _weightController.text =
+            _weight?.toString() ?? bwday?.toString() ?? ''; // bwday fallback
         _neckController.text = _neck?.toString() ?? '';
         _waistController.text = _waist?.toString() ?? '';
         _hipController.text = _hip?.toString() ?? '';
       } else {
-        _height = sharedPrefHeight;
-        _weight = bwday; // Set weight from bwday if available
+        _height = sharedPrefHeight; // Only height from shared preferences
+        _weight = bwday; // Weight from bwday if available
         _heightController.text = _height?.toString() ?? '';
         _weightController.text = _weight?.toString() ?? '';
         _neckController.clear();
@@ -202,6 +205,7 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
 
               // Height input (cm)
               TextFormField(
+                controller: _heightController,
                 decoration: const InputDecoration(labelText: 'Height (cm)'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
@@ -220,6 +224,7 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
 
               // Weight input (kg)
               TextFormField(
+                controller: _weightController,
                 decoration: const InputDecoration(labelText: 'Weight (kg)'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
@@ -235,6 +240,7 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
 
               // Neck circumference input (cm)
               TextFormField(
+                controller: _neckController,
                 decoration: const InputDecoration(labelText: 'Neck (cm)'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
@@ -250,6 +256,7 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
 
               // Waist circumference input (cm)
               TextFormField(
+                controller: _waistController,
                 decoration: const InputDecoration(labelText: 'Waist (cm)'),
                 keyboardType: TextInputType.number,
                 validator: (value) {
@@ -266,6 +273,7 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
               // Hip circumference input (cm) - only for women
               if (_gender == 'female')
                 TextFormField(
+                  controller: _hipController,
                   decoration: const InputDecoration(labelText: 'Hip (cm)'),
                   keyboardType: TextInputType.number,
                   validator: (value) {

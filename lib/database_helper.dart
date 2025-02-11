@@ -84,6 +84,10 @@ class DatabaseHelper {
     return dbPath;
   }
 
+  Future<double> getBwday(String date) async {
+    return 70.0;
+  }
+
   Future<WeightEntry?> getWeightEntry(String date) async {
     final db = await database;
     final maps = await db.query(

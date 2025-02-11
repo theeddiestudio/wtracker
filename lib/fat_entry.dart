@@ -28,7 +28,10 @@ class FatEntry {
       'neck': neck,
       'waist': waist,
       'hip': hip,
-      'bodyFat': bodyFat,
+      'bodyFat': bodyFat != null
+          ? double.parse(
+              bodyFat!.toStringAsFixed(bodyFat! * 10 % 10 == 0 ? 1 : 2))
+          : null,
     };
   }
 
