@@ -85,21 +85,12 @@ flutter run
 
 ## 📷 **Screenshots**  
 
-| Tracker Page (Light) | Tracker Page (Dark) | History Page (Light) | History Page (Dark) |
-|--------------|-------------|--------------|-------------|
-| ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/tracker%20page/tracker%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/tracker%20page/tracker%20-%20dark%20mode.jpg?raw=true) | ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/history%20page/history%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/history%20page/history%20-%20dark%20mode.jpg?raw=true) |
-| Detailed View (Light) | Detailed View (Dark) |
-|--------------|-------------|
-| ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/history%20page/detail%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/history%20page/detail%20-%20dark%20mode.jpg?raw=true) |
-| Graph Page (Light) | Graph Page (Dark) |
-|--------------|-------------|
-| ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/graph%20page/graph%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/graph%20page/graph%20-%20dark%20mode.jpg?raw=true) |
-| MW Graph Page (Light) | MW Graph Page (Dark) |
-|--------------|-------------|
-| ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/mw%20graph/mwgraph%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/mw%20graph/mwgraph%20-%20dark%20mode.jpg?raw=true) |
-| Settings Page (Light) | Settings Page (Dark) |
-|--------------|-------------|
-| ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/settings%20page/settings%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/settings%20page/settings%20-%20dark%20mode.jpg?raw=true) |
+| Tracker Page (Light) | Tracker Page (Dark) | History Page (Light) | History Page (Dark) | Detailed View (Light) | Detailed View (Dark) |
+|--------------|-------------|--------------|-------------|--------------|-------------|
+| ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/tracker%20page/tracker%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/tracker%20page/tracker%20-%20dark%20mode.jpg?raw=true) | ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/history%20page/history%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/history%20page/history%20-%20dark%20mode.jpg?raw=true) | ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/history%20page/detail%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/history%20page/detail%20-%20dark%20mode.jpg?raw=true) |
+| Graph Page (Light) | Graph Page (Dark) | MW Graph Page (Light) | MW Graph Page (Dark) | Settings Page (Light) | Settings Page (Dark) |
+|--------------|-------------|--------------|-------------|--------------|-------------|
+| ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/graph%20page/graph%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/graph%20page/graph%20-%20dark%20mode.jpg?raw=true) | ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/mw%20graph/mwgraph%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/mw%20graph/mwgraph%20-%20dark%20mode.jpg?raw=true) | ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/settings%20page/settings%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/settings%20page/settings%20-%20dark%20mode.jpg?raw=true) |
 
 More previews available in the **[Screenshots Folder](https://github.com/theeddiestudio/wtracker/screenshots)**  
 
