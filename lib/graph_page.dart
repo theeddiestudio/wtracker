@@ -262,7 +262,7 @@ class _FullScreenGraphState extends State<FullScreenGraph> {
             child: InteractiveViewer(
               panEnabled: true,
               scaleEnabled: true,
-              boundaryMargin: const EdgeInsets.all(20),
+              boundaryMargin: const EdgeInsets.all(8),
               minScale: 0.5,
               maxScale: 5.0,
               child: SingleChildScrollView(

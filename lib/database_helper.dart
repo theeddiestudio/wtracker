@@ -44,15 +44,13 @@ class DatabaseHelper {
     ''');
     await db.execute('''
       CREATE TABLE IF NOT EXISTS fat_entries (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        date TEXT UNIQUE,
-        gender TEXT,
-        height REAL,
-        weight REAL,
+        date TEXT PRIMARY KEY,
         neck REAL,
         waist REAL,
         hip REAL,
-        bodyFat REAL
+        bodyFat REAL,
+        fatMass REAL,
+        leanMass REAL
       )
     ''');
   }

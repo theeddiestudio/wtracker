@@ -182,7 +182,7 @@ class _TrackerPageState extends State<TrackerPage> {
         DateFormat('EEEE').format(_currentDate); // Day of week (e.g., "Monday")
 
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(6.0),
       child: Column(
         children: [
           // Add arrows to change date

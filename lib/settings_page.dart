@@ -6,6 +6,8 @@ import 'package:android_intent/android_intent.dart';
 import 'dart:io';
 import 'dart:convert';
 import 'database_helper.dart';
+import 'bfdb_helper.dart';
+import 'fat_entry.dart';
 import 'home.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -17,6 +19,7 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   bool _showDots = true;
+  bool _isMetricSystem = true;
   bool _notificationsEnabled = false;
   bool _encryptionEnabled = false;
 
@@ -29,6 +32,7 @@ class _SettingsPageState extends State<SettingsPage> {
       setState(() {
         // Set the rest of the settings from the settings file
         _showDots = fileSettings['enable_dots'] ?? true;
+        _isMetricSystem = fileSettings['measurement_system'] ?? true;
         _encryptionEnabled = fileSettings['encryption_enabled'] ?? false;
 
         // Load dark mode setting and apply it
@@ -39,6 +43,14 @@ class _SettingsPageState extends State<SettingsPage> {
 
       // Check the current notification permission status
       _checkNotificationPermission();
+    });
+  }
+
+  // Add a method to save the measurement system setting
+  Future<void> _saveMeasurementSystem(bool value) async {
+    await _saveSettings('measurement_system', value);
+    setState(() {
+      _isMetricSystem = value;
     });
   }
 
@@ -69,6 +81,68 @@ class _SettingsPageState extends State<SettingsPage> {
       await dir.create(recursive: true);
     }
     return '${dir.path}/settings.json';
+  }
+
+  Future<void> updateFatDataOnToggle(bool isMetric) async {
+    final prefs = await SharedPreferences.getInstance();
+    final fatDbHelper = FatEntryDatabaseHelper.instance;
+
+    // Modifiers for unit conversion
+    double _lengthModifier = 0.393701; // cm to inches
+    double _weightModifier = 2.20462; // kg to lbs
+
+    // Retrieve height and weight from SharedPreferences
+    double? height = prefs.getDouble('height');
+    double? weight = prefs.getDouble('weight');
+
+    // Convert height and weight based on the selected measurement system
+    if (height != null) {
+      height = isMetric ? height / _lengthModifier : height * _lengthModifier;
+      await prefs.setDouble('height', height);
+    }
+
+    if (weight != null) {
+      weight = isMetric ? weight / _weightModifier : weight * _weightModifier;
+      await prefs.setDouble('weight', weight);
+    }
+
+    // Retrieve the latest fat entry from the database
+    final entry = await fatDbHelper
+        .getFatEntry(DateTime.now().toLocal().toString().split(' ')[0]);
+
+    if (entry != null) {
+      // Convert neck, waist, hip, fat mass, and lean mass based on the selected measurement system
+      double neck = isMetric
+          ? entry.neck / _lengthModifier
+          : entry.neck * _lengthModifier;
+      double waist = isMetric
+          ? entry.waist / _lengthModifier
+          : entry.waist * _lengthModifier;
+      double? hip = entry.hip == null
+          ? null
+          : (isMetric
+              ? entry.hip! / _lengthModifier
+              : entry.hip! * _lengthModifier);
+      double fatMass = isMetric
+          ? entry.fatMass! / _weightModifier
+          : entry.fatMass! * _weightModifier;
+      double leanMass = isMetric
+          ? entry.leanMass! / _weightModifier
+          : entry.leanMass! * _weightModifier;
+
+      // Update the database with the converted values
+      final updatedEntry = FatEntry(
+        date: entry.date,
+        neck: neck,
+        waist: waist,
+        hip: hip,
+        bodyFat: entry.bodyFat, // Body fat percentage remains unchanged
+        fatMass: fatMass,
+        leanMass: leanMass,
+      );
+
+      await fatDbHelper.insertFatEntry(updatedEntry);
+    }
   }
 
   Future<void> toggleNotifications(bool value) async {
@@ -140,7 +214,7 @@ class _SettingsPageState extends State<SettingsPage> {
         title: const Text('Settings'),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(6),
         children: [
           const Divider(thickness: 3),
           const SizedBox(height: 8),
@@ -160,6 +234,14 @@ class _SettingsPageState extends State<SettingsPage> {
             onChanged: (value) async {
               await _saveSettings('dark_mode', value);
               themeProvider.toggleTheme(value);
+            },
+          ),
+          SwitchListTile(
+            title: const Text('Enable Metric System'),
+            value: _isMetricSystem,
+            onChanged: (value) async {
+              await updateFatDataOnToggle(value);
+              await _saveMeasurementSystem(value);
             },
           ),
           /* SwitchListTile(
@@ -198,6 +280,7 @@ class _SettingsPageState extends State<SettingsPage> {
               final settingsFile = File(await _getSettingsPath());
               final defaultSettings = {
                 "enable_dots": true,
+                "measurement_system": true,
                 // "notifications_enabled": false,
                 "encryption_enabled": false,
                 "dark_mode": false
@@ -210,6 +293,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
               setState(() {
                 _showDots = true;
+                _isMetricSystem = true;
                 _encryptionEnabled = false;
               });
 
