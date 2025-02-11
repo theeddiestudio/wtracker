@@ -85,9 +85,9 @@ flutter run
 
 ## 📷 **Screenshots**  
 
-| Tracker Page (Light) | Tracker Page (Dark) || History Page (Light) | History Page (Dark) |
-|--------------|-------------||--------------|-------------|
-| ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/tracker%20page/tracker%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/tracker%20page/tracker%20-%20dark%20mode.jpg?raw=true) || ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/history%20page/history%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/history%20page/history%20-%20dark%20mode.jpg?raw=true) |
+| Tracker Page (Light) | Tracker Page (Dark) | History Page (Light) | History Page (Dark) |
+|--------------|-------------|--------------|-------------|
+| ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/tracker%20page/tracker%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/tracker%20page/tracker%20-%20dark%20mode.jpg?raw=true) | ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/history%20page/history%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/history%20page/history%20-%20dark%20mode.jpg?raw=true) |
 | Detailed View (Light) | Detailed View (Dark) |
 |--------------|-------------|
 | ![Light](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/history%20page/detail%20-%20light%20mode.jpg?raw=true) | ![Dark](https://github.com/theeddiestudio/wtracker/blob/main/screenshots/history%20page/detail%20-%20dark%20mode.jpg?raw=true) |
