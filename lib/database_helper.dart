@@ -42,6 +42,19 @@ class DatabaseHelper {
         bwwk REAL
       )
     ''');
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS fat_entries (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date TEXT UNIQUE,
+        gender TEXT,
+        height REAL,
+        weight REAL,
+        neck REAL,
+        waist REAL,
+        hip REAL,
+        bodyFat REAL
+      )
+    ''');
   }
 
   Future<int> insertWeightEntry(WeightEntry entry) async {

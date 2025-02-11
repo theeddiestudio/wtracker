@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'tracker_page.dart';
 import 'history_page.dart';
 import 'graph_page.dart';
+import 'bf_page.dart';
 import 'settings_page.dart';
 import 'mw_graph.dart';
 
@@ -45,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // Pages for navigation
   static const List<Widget> _pages = [
     TrackerPage(),
+    BodyFatTrackerPage(),
     HistoryPage(),
     GraphPage(),
     MWGraphPage(),
@@ -166,8 +168,8 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.history),
-              title: const Text('History'),
+              leading: const Icon(Icons.donut_small),
+              title: const Text('Fat Tracker'),
               selected: _selectedIndex == 1,
               onTap: () {
                 Navigator.pop(context); // Close the drawer
@@ -175,8 +177,8 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.show_chart),
-              title: const Text('Graph'),
+              leading: const Icon(Icons.history),
+              title: const Text('History'),
               selected: _selectedIndex == 2,
               onTap: () {
                 Navigator.pop(context); // Close the drawer
@@ -185,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.show_chart),
-              title: const Text('MW Graph'),
+              title: const Text('Graph'),
               selected: _selectedIndex == 3,
               onTap: () {
                 Navigator.pop(context); // Close the drawer
@@ -193,12 +195,21 @@ class _HomeScreenState extends State<HomeScreen> {
               },
             ),
             ListTile(
-              leading: const Icon(Icons.settings),
-              title: const Text('Settings'),
+              leading: const Icon(Icons.auto_graph_outlined),
+              title: const Text('MW Graph'),
               selected: _selectedIndex == 4,
               onTap: () {
                 Navigator.pop(context); // Close the drawer
                 _onItemTapped(4);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Settings'),
+              selected: _selectedIndex == 5,
+              onTap: () {
+                Navigator.pop(context); // Close the drawer
+                _onItemTapped(5);
               },
             ),
           ],
