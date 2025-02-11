@@ -112,18 +112,23 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
       return null; // Not enough data
     }
 
-    double heightInInches = _height! * 0.393701;
-
     // Define log10 function
     double log10(double x) => log(x) / log(10);
 
+    double heightInInches = _height! * 0.393701;
+    double neckInInches = _neck! * 0.393701;
+    double waistInInches = _waist! * 0.393701;
+
     if (_gender == 'male') {
-      double logValue = log10(_waist! - _neck!);
-      _bodyFat = (86.010 * logValue) - (70.041 * log10(heightInInches)) + 36.76;
+      _bodyFat = (86.010 * log10(waistInInches - neckInInches)) -
+          (70.041 * log10(heightInInches)) +
+          36.76;
     } else {
       if (_hip == null) return null; // Hip measurement required for women
-      _bodyFat = (163.205 * log10(_waist! + _hip! - _neck!)) -
-          (97.684 * log10(heightInInches)) -
+      double hipInInches = _hip! * 0.393701;
+
+      _bodyFat = (163.205 * log10(waistInInches + hipInInches - neckInInches)) -
+          (97.684 * log(heightInInches)) -
           78.387;
     }
 
