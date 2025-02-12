@@ -54,7 +54,7 @@ A **Flutter-based** weight tracking app designed for easy weight monitoring with
 ## 🚀 **Upcoming Features**  
 
 🔹 **Yearly Graph** – View 365 days of weight trends.  
-🔹 **History Page for Body Fat Data** – Store past entries for better tracking.
+🔹 **History Page for Body Fat Data** – Store past entries for better tracking.  
 🔹 **Settings Enhancements** – More customization options.  
 🔹 **Notification System** – Daily weight reminders & progress alerts.  
 
