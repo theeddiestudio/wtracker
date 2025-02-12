@@ -368,6 +368,22 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
                   },
                 ),
 
+              const SizedBox(height: 10),
+
+              if (_fatMass != null && _leanMass != null)
+                Column(
+                  children: [
+                    Text(
+                      'Body Fat Mass: ${_isMetricSystem ? _fatMass!.toStringAsFixed(2) + ' kg' : (_fatMass! * _weightModifier).toStringAsFixed(2) + ' lbs'}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    Text(
+                      'Lean Body Mass: ${_isMetricSystem ? _leanMass!.toStringAsFixed(2) + ' kg' : (_leanMass! * _weightModifier).toStringAsFixed(2) + ' lbs'}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ],
+                ),
+
               const SizedBox(height: 12),
 
               // Display calculated body fat
