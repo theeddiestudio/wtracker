@@ -15,8 +15,8 @@ class BodyFatTrackerPage extends StatefulWidget {
 
 class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
   bool _isMetricSystem = true;
-  double _lengthModifier = 0.393701; // cm to inches
-  double _weightModifier = 2.20462; // kg to lbs
+  double _lengthModifier = 1.0; // cm to inches
+  double _weightModifier = 1.0; // kg to lbs
 
   double? _fatMass;
   double? _leanMass;
@@ -40,31 +40,12 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
   void initState() {
     super.initState();
     _loadSavedData();
-    _loadMeasurementSystem();
   }
 
-  // Load the measurement system setting
-  Future<void> _loadMeasurementSystem() async {
-    final path = await _getSettingsPath();
-    final settingsFile = File(path);
-
-    if (await settingsFile.exists()) {
-      final jsonString = await settingsFile.readAsString();
-      final settings = jsonDecode(jsonString);
-      setState(() {
-        _isMetricSystem = settings['measurement_system'] ?? true;
-        _lengthModifier =
-            _isMetricSystem ? 0.393701 : 1.0; // Set modifier based on system
-      });
-    }
-  }
-
-  Future<String> _getSettingsPath() async {
-    final dir = Directory('/storage/emulated/0/.wtracker/settings');
-    if (!await dir.exists()) {
-      await dir.create(recursive: true);
-    }
-    return '${dir.path}/settings.json';
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _loadSavedData();
   }
 
   Future<void> _loadSavedData() async {
@@ -77,12 +58,30 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
     double? sharedPrefHeight = prefs.getDouble('height');
     double? sharedPrefWeight = prefs.getDouble('weight');
     String? sharedPrefGender = prefs.getString('gender');
+    bool? sharedPrefMS = prefs.getBool('measurement_system') ?? true;
 
     setState(() {
+      _isMetricSystem = sharedPrefMS;
+      _lengthModifier =
+          sharedPrefMS ? 1.0 : 0.393701; // Set modifier based on system
+      _weightModifier = sharedPrefMS ? 1.0 : 2.20462;
+
       _gender = sharedPrefGender ??
           'male'; // Default to 'male' if sharedPrefGender is null
       _height = sharedPrefHeight; // Only height from shared preferences
       _weight = sharedPrefWeight; // Weight from sharedPrefWeight if available
+
+      _heightController.text = _height != null
+          ? (_isMetricSystem
+              ? _height!.toStringAsFixed(2)
+              : (_height! * _lengthModifier).toStringAsFixed(2))
+          : '';
+
+      _weightController.text = _weight != null
+          ? (_isMetricSystem
+              ? _weight!.toStringAsFixed(2)
+              : (_weight! * _weightModifier).toStringAsFixed(2))
+          : '';
 
       if (entry != null) {
         _neck = entry.neck;
@@ -92,16 +91,24 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
         _fatMass = entry.fatMass;
         _leanMass = entry.leanMass;
 
-        _heightController.text = _height?.toString() ?? '';
-        _weightController.text = _weight?.toString() ??
-            sharedPrefWeight?.toString() ??
-            ''; // sharedPrefWeight fallback
-        _neckController.text = _neck?.toString() ?? '';
-        _waistController.text = _waist?.toString() ?? '';
-        _hipController.text = _hip?.toString() ?? '';
+        _neckController.text = _neck != null
+            ? (_isMetricSystem
+                ? _neck!.toStringAsFixed(0)
+                : (_neck! * _lengthModifier).toStringAsFixed(0))
+            : '';
+
+        _waistController.text = _waist != null
+            ? (_isMetricSystem
+                ? _waist!.toStringAsFixed(0)
+                : (_waist! * _lengthModifier).toStringAsFixed(0))
+            : '';
+
+        _hipController.text = _hip != null
+            ? (_isMetricSystem
+                ? _hip!.toStringAsFixed(0)
+                : (_hip! * _lengthModifier).toStringAsFixed(0))
+            : '';
       } else {
-        _heightController.text = _height?.toString() ?? '';
-        _weightController.text = _weight?.toString() ?? '';
         _neckController.clear();
         _waistController.clear();
         _hipController.clear();
@@ -155,16 +162,11 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
       _calculateFatAndLeanMass();
 
       // Convert to metric if necessary
-      double leanMassInMetric =
-          _isMetricSystem ? _leanMass! : _leanMass! / _weightModifier;
-      double fatMassInMetric =
-          _isMetricSystem ? _fatMass! : _fatMass! / _weightModifier;
-      double neckInMetric = _isMetricSystem ? _neck! : _neck! / _lengthModifier;
-      double waistInMetric =
-          _isMetricSystem ? _waist! : _waist! / _lengthModifier;
-      double? hipInMetric = _hip == null
-          ? null
-          : (_isMetricSystem ? _hip! : _hip! / _lengthModifier);
+      double neckInMetric = _neck!;
+      double waistInMetric = _waist!;
+      double? hipInMetric = _hip == null ? null : _hip!;
+      double fatMassInMetric = _fatMass!;
+      double leanMassInMetric = _leanMass!;
 
       final fatDbHelper = FatEntryDatabaseHelper.instance;
       final entry = FatEntry(
@@ -192,9 +194,18 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
     // Define log10 function
     double log10(double x) => log(x) / log(10);
 
-    double heightInInches = _height! * _lengthModifier;
-    double neckInInches = _neck! * _lengthModifier;
-    double waistInInches = _waist! * _lengthModifier;
+    /* double heightInInches =
+        _isMetricSystem ? _height! * _lengthModifier : _height!;
+    double neckInInches = _isMetricSystem ? _neck! * _lengthModifier : _neck!;
+    double waistInInches =
+        _isMetricSystem ? _waist! * _lengthModifier : _waist!; */
+
+    double heightInInches = _height! * 0.393701;
+    ; // use raw value cause the modifier is changing while value is always metric.
+    double waistInInches = _waist! * 0.393701;
+    ;
+    double neckInInches = _neck! * 0.393701;
+    ;
 
     if (_gender == 'male') {
       _bodyFat = (86.010 * log10(waistInInches - neckInInches)) -
@@ -202,7 +213,9 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
           36.76;
     } else {
       if (_hip == null) return null; // Hip measurement required for women
+      // double hipInInches = _isMetricSystem ? _hip! * _lengthModifier : _hip!;
       double hipInInches = _hip! * 0.393701;
+      ;
 
       _bodyFat = (163.205 * log10(waistInInches + hipInInches - neckInInches)) -
           (97.684 * log(heightInInches)) -
@@ -280,7 +293,7 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
                   return null;
                 },
                 onSaved: (value) {
-                  _height = double.tryParse(value!);
+                  _height = double.tryParse(value!)! / _lengthModifier;
                   if (_height != null) {
                     _saveHeight(_height!);
                   }
@@ -299,7 +312,7 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
                   return null;
                 },
                 onSaved: (value) {
-                  _weight = double.tryParse(value!);
+                  _weight = double.tryParse(value!)! / _weightModifier;
                   if (_weight != null) {
                     _saveWeight(_weight!);
                   }
@@ -318,7 +331,7 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
                   return null;
                 },
                 onSaved: (value) {
-                  _neck = double.tryParse(value!);
+                  _neck = double.tryParse(value!)! / _lengthModifier;
                 },
               ),
 
@@ -334,7 +347,7 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
                   return null;
                 },
                 onSaved: (value) {
-                  _waist = double.tryParse(value!);
+                  _waist = double.tryParse(value!)! / _lengthModifier;
                 },
               ),
 
@@ -351,23 +364,8 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
                     return null;
                   },
                   onSaved: (value) {
-                    _hip = double.tryParse(value!);
+                    _hip = double.tryParse(value!)! / _lengthModifier;
                   },
-                ),
-              const SizedBox(height: 10),
-
-              if (_fatMass != null && _leanMass != null)
-                Column(
-                  children: [
-                    Text(
-                      'Body Fat Mass: ${_isMetricSystem ? _fatMass!.toStringAsFixed(2) + ' kg' : (_fatMass! * _weightModifier).toStringAsFixed(2) + ' lbs'}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    Text(
-                      'Lean Body Mass: ${_isMetricSystem ? _leanMass!.toStringAsFixed(2) + ' kg' : (_leanMass! * _weightModifier).toStringAsFixed(2) + ' lbs'}',
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                  ],
                 ),
 
               const SizedBox(height: 12),

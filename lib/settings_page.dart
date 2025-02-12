@@ -32,7 +32,6 @@ class _SettingsPageState extends State<SettingsPage> {
       setState(() {
         // Set the rest of the settings from the settings file
         _showDots = fileSettings['enable_dots'] ?? true;
-        _isMetricSystem = fileSettings['measurement_system'] ?? true;
         _encryptionEnabled = fileSettings['encryption_enabled'] ?? false;
 
         // Load dark mode setting and apply it
@@ -48,13 +47,18 @@ class _SettingsPageState extends State<SettingsPage> {
 
   // Add a method to save the measurement system setting
   Future<void> _saveMeasurementSystem(bool value) async {
-    await _saveSettings('measurement_system', value);
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(
+        'measurement_system', value); // Save to SharedPreferences
     setState(() {
       _isMetricSystem = value;
     });
   }
 
   Future<void> _checkNotificationPermission() async {
+    final prefs = await SharedPreferences.getInstance();
+    _isMetricSystem = prefs.getBool('measurement_system') ?? true;
+
     // Check the current notification permission status
     PermissionStatus status = await Permission.notification.status;
 
@@ -123,12 +127,6 @@ class _SettingsPageState extends State<SettingsPage> {
           : (isMetric
               ? entry.hip! / _lengthModifier
               : entry.hip! * _lengthModifier);
-      double fatMass = isMetric
-          ? entry.fatMass! / _weightModifier
-          : entry.fatMass! * _weightModifier;
-      double leanMass = isMetric
-          ? entry.leanMass! / _weightModifier
-          : entry.leanMass! * _weightModifier;
 
       // Update the database with the converted values
       final updatedEntry = FatEntry(
@@ -137,8 +135,8 @@ class _SettingsPageState extends State<SettingsPage> {
         waist: waist,
         hip: hip,
         bodyFat: entry.bodyFat, // Body fat percentage remains unchanged
-        fatMass: fatMass,
-        leanMass: leanMass,
+        fatMass: entry.fatMass,
+        leanMass: entry.leanMass,
       );
 
       await fatDbHelper.insertFatEntry(updatedEntry);
@@ -240,7 +238,7 @@ class _SettingsPageState extends State<SettingsPage> {
             title: const Text('Enable Metric System'),
             value: _isMetricSystem,
             onChanged: (value) async {
-              await updateFatDataOnToggle(value);
+              // await updateFatDataOnToggle(value);
               await _saveMeasurementSystem(value);
             },
           ),
@@ -276,11 +274,12 @@ class _SettingsPageState extends State<SettingsPage> {
               final dbHelper = DatabaseHelper.instance;
               await dbHelper.resetDatabase();
 
+              await _saveMeasurementSystem(true);
+
               // Reset settings.json to default values
               final settingsFile = File(await _getSettingsPath());
               final defaultSettings = {
                 "enable_dots": true,
-                "measurement_system": true,
                 // "notifications_enabled": false,
                 "encryption_enabled": false,
                 "dark_mode": false
