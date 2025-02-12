@@ -9,32 +9,28 @@ A **Flutter-based** weight tracking app designed for easy weight monitoring with
 
 ---
 
-## 📢 **Latest Release - v2.0.0 (Stable)**  
+## 📢 **Latest Release - v2.3.1 (Stable)**  
 
 ### **New Features & Improvements**  
 
-✅ **MW (Monthly Week) Graph Page & Fullscreen Mode**  
-- Added a new **MW Graph Page** to visualize weight trends.  
-- Introduced a **fullscreen mode** for better data analysis. *(v1.4.0)*  
+✅ **Body Fat Tracker Added** *(v2.1.0)*  
+- Track **body fat percentage**, **fat mass**, and **lean mass**.  
 
-✅ **Weight Tracking Labels Fixed**  
-- Corrected **time of the day** labels for weight entries. *(v1.4.1)*  
+✅ **Fixed Body Fat Calculation Formula** *(v2.1.1)*  
+- Corrected inaccuracies in the body fat formula.  
 
-✅ **Enhanced Week Tracking System**  
-- Introduced `week_entries` for a better tracking method. *(v1.5.0)*  
-- *(Known Issue: DetailPage does not currently view/update `bwwk`.)*  
+✅ **Measurement System Toggle** *(v2.2.0)*  
+- Switch between **metric (kg/cm)** and **imperial (lbs/in)**.  
+- Auto-conversion of existing data for consistency.  
 
-✅ **Database & History Page Fixes**  
-- Refactored data storage using the **week_entry format**. *(v1.5.1)*  
-- **History Page** now properly views and updates `bwwk`.  
+✅ **Improved Body Fat Tracker UI** *(v2.2.0 - v2.3.0)*  
+- Enhanced layout with **better dividers, gaps, and dynamic text colors**.  
+- Body fat percentage now **displays in color** for quick assessment.  
 
-✅ **Data Deletion Improvements**  
-- Deleting an entry now updates the corresponding **week data** correctly. *(v1.5.2)*  
-
-✅ **MW Graph Data Fixes & Performance Enhancements**  
-- Fixed **data retrieval issues** in MW Graph. *(v1.6.0)*  
-- **Bug Fix:** `_showDots` setting now works properly with MW Graph. *(v1.6.1)*  
-- **Performance Boost:** MW Graph initialization is now **faster**. *(v1.6.2)*  
+✅ **Bug Fixes & Optimizations** *(v2.3.1)*  
+✔ Fixed incorrect **metric-imperial conversion**.  
+✔ Resolved missing **fat mass & lean mass** calculations.  
+✔ UI improvements for **better readability & user experience**.  
 
 📌 **[Full Release Notes](https://github.com/theeddiestudio/wtracker/releases)**  
 
@@ -43,9 +39,11 @@ A **Flutter-based** weight tracking app designed for easy weight monitoring with
 ## 🔥 **Key Features**  
 
 ✔ **Weight Tracking** – Log weight multiple times a day.  
+✔ **Body Fat Tracking** – Log required parameters and calculate body fat.  
 ✔ **Interactive Graphs** – Weekly and monthly graph visualizations.  
 ✔ **Dark Mode Support** – Enhanced readability.  
 ✔ **Graph Dot Feature** – Toggle dots on graphs for better visibility.  
+✔ **Metric/Imperial Systems for Body Fat Tracking** – Use the appropriate measurement system.  
 ✔ **Persistent Data Storage** – Keeps weight logs safe even after reinstalling.  
 ✔ **History View & Management** – Edit and manage past weight entries.  
 ✔ **MW Graph Page** – A dedicated graph for Monthly Week graph.  
@@ -55,8 +53,9 @@ A **Flutter-based** weight tracking app designed for easy weight monitoring with
 
 ## 🚀 **Upcoming Features**  
 
+🔹 **Yearly Graph** – View 365 days of weight trends.  
+🔹 **History Page for Body Fat Data** – Store past entries for better tracking.
 🔹 **Settings Enhancements** – More customization options.  
-🔹 **New Graph Types** – Alternative views for better insights.  
 🔹 **Notification System** – Daily weight reminders & progress alerts.  
 
 ---
