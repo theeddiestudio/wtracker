@@ -164,7 +164,7 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
       // Convert to metric if necessary
       double neckInMetric = _neck!;
       double waistInMetric = _waist!;
-      double? hipInMetric = _hip == null ? null : _hip!;
+      double? hipInMetric = _hip!;
       double fatMassInMetric = _fatMass!;
       double leanMassInMetric = _leanMass!;
 
@@ -215,11 +215,15 @@ class _BodyFatTrackerPageState extends State<BodyFatTrackerPage> {
       if (_hip == null) return null; // Hip measurement required for women
       // double hipInInches = _isMetricSystem ? _hip! * _lengthModifier : _hip!;
       double hipInInches = _hip! * 0.393701;
-      ;
 
       _bodyFat = (163.205 * log10(waistInInches + hipInInches - neckInInches)) -
-          (97.684 * log(heightInInches)) -
+          (97.684 * log10(heightInInches)) -
           78.387;
+    }
+
+    // Ensure body fat percentage is within a reasonable range
+    if (_bodyFat != null && (_bodyFat! < 0 || _bodyFat! > 100)) {
+      return 0; // Invalid body fat percentage
     }
 
     return _bodyFat;
