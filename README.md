@@ -9,28 +9,12 @@ A **Flutter-based** weight tracking app designed for easy weight monitoring with
 
 ---
 
-## 📢 **Latest Release - v2.3.1 (Stable)**  
+## 📢 **Latest Release - v2.3.2 (Stable)**  
 
-### **New Features & Improvements**  
+### **Bug Fix:**  
 
-✅ **Body Fat Tracker Added** *(v2.1.0)*  
-- Track **body fat percentage**, **fat mass**, and **lean mass**.  
-
-✅ **Fixed Body Fat Calculation Formula** *(v2.1.1)*  
-- Corrected inaccuracies in the body fat formula.  
-
-✅ **Measurement System Toggle** *(v2.2.0)*  
-- Switch between **metric (kg/cm)** and **imperial (lbs/in)**.  
-- Auto-conversion of existing data for consistency.  
-
-✅ **Improved Body Fat Tracker UI** *(v2.2.0 - v2.3.0)*  
-- Enhanced layout with **better dividers, gaps, and dynamic text colors**.  
-- Body fat percentage now **displays in color** for quick assessment.  
-
-✅ **Bug Fixes & Optimizations** *(v2.3.1)*  
-✔ Fixed incorrect **metric-imperial conversion**.  
-✔ Resolved missing **fat mass & lean mass** calculations.  
-✔ UI improvements for **better readability & user experience**.  
+✔ **Fixed Body Fat Calculation for Female Users** 🛠️ *(v2.3.2)*  
+   - Resolved the incorrect body fat percentage calculation for female users, ensuring accurate results based on the correct formula.
 
 📌 **[Full Release Notes](https://github.com/theeddiestudio/wtracker/releases)**  
 
